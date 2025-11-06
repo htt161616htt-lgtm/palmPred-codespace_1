@@ -2,17 +2,32 @@
 set -e
 
 # Update system
-apt-get update && apt-get install -y \
-    wget \
-    unzip \
-    python3-pip
+sudo apt-get update && sudo apt-get install -y \
+    python3 python3-pip python3-venv git wget unzip
 
-# Download PalmPred (replace link with real one later)
-wget -O palmPred.zip "<PASTE_PALMPRED_DOWNLOAD_URL_HERE>"
-unzip palmPred.zip -d palmPred
-cd palmPred
+# Create Python virtual environment
+python3 -m venv palm-env
+source palm-env/bin/activate
 
-pip install -r requirements.txt || true
-chmod +x palmPred.py
+# Install core packages
+pip install --upgrade pip
+pip install biopython numpy pandas scikit-learn joblib
 
-echo "PalmPred installation complete. Run with: python3 palmPred.py <input.fasta>"
+# Clone PalmPred repository
+if [ ! -d "PalmPred" ]; then
+    git clone https://github.com/Wenlab/PalmPred.git
+fi
+
+cd PalmPred
+
+# Install PalmPred dependencies
+if [ -f "requirements.txt" ]; then
+    pip install -r requirements.txt || true
+fi
+
+chmod +x palm_pred.py || true
+
+echo ""
+echo "✅ PalmPred installation complete!"
+echo "👉 To start: source palm-env/bin/activate"
+echo "👉 Then run: python PalmPred/palm_pred.py --help"
